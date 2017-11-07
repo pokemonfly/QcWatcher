@@ -30,15 +30,15 @@ export default function ( cpt ) {
                         return xhr;
                     }
                     var startTime,
-                        s,
+                        apiUri,
                         send = xhr.send,
                         open = xhr.open,
                         conf = i._conf;
                     xhr.open = function ( body, t ) {
                         var args = 1 === arguments.length ? [arguments[0]] : Array.apply( null, arguments );
                         open.apply( xhr, args ),
-                        s = ( t || "" ).replace( /\?.*$/, "" ),
-                        s = s ? utils.fbr( s, conf.ignoreApiPath ) : ""
+                        apiUri = ( t || "" ).replace( /\?.*$/, "" ),
+                        apiUri = apiUri ? utils.fbr( apiUri, conf.ignoreApiPath ) : ""
                     }
                     xhr.send = function ( ) {
                         startTime = Date.now( );
@@ -46,23 +46,23 @@ export default function ( cpt ) {
                         send.apply( xhr, args )
                     }
                     utils.on( xhr, "readystatechange", function ( ) {
-                        if ( s && 4 === xhr.readyState ) {
+                        if ( apiUri && 4 === xhr.readyState ) {
                             var costTime = Date.now( ) - startTime;
                             if ( xhr.status >= 200 && xhr.status <= 299 ) {
-                                var t = xhr.status || 200;
+                                var code = xhr.status || 200;
                                 if ( xhr.responseType && "text" !== xhr.responseType ) {
-                                    i.api( s, true, costTime, t, "" );
+                                    i.api( apiUri, true, costTime, t, "" );
                                 } else {
                                     var json = utils.parseJson( xhr.responseText ) || null,
                                         u = utils.xcall(conf.parseResponse, [
-                                            json, s
+                                            json, apiUri
                                         ], { }),
                                         result = !( "success" in u ) || u.success;
-                                    t = u.code || t,
-                                    i.api( s, result, costTime, t, u.msg )
+                                    code = u.code || code
+                                    i.api( apiUri, result, costTime, code, u.msg, xhr.response.length )
                                 }
-                            } else 
-                                i.api( s, false, e, xhr.status || "FAILED", xhr.statusText )
+                            } else
+                                i.api( apiUri, false, costTime, xhr.status || "FAILED", xhr.statusText )
                         }
                     })
                     return xhr
@@ -79,7 +79,7 @@ export default function ( cpt ) {
             window[fetch] = function ( t ) {
                 var a = 1 === arguments.length ? [arguments[0]] : Array.apply( null, arguments ),
                     s = o;
-                if ( !s || !s.api ) 
+                if ( !s || !s.api )
                     return e.apply( n, a );
                 var u = Date.now( ),
                     c = s._conf,
@@ -88,7 +88,7 @@ export default function ( cpt ) {
                 return l = l.replace( /\?.*$/, "" ),
                 l = utils.fbr( l, c.ignoreApiPath ),
                 e.apply( n, a ).then( function ( e ) {
-                    if ( !s || !s.api ) 
+                    if ( !s || !s.api )
                         return e;
                     var t = e.clone( ),
                         n = Date.now( ) - u;
@@ -103,7 +103,7 @@ export default function ( cpt ) {
                     }) : s.api( l, !1, n, t.status || 404, t.statusText ),
                     e
                 })[i[0]]( function ( e ) {
-                    if ( !s || !s.api ) 
+                    if ( !s || !s.api )
                         throw e;
                     var t = Date.now( ) - u;
                     throw s.api( l, !1, t, e.name || "Error", e.message ),

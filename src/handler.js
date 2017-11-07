@@ -1,19 +1,16 @@
 import utils from './utils'
 
 export default function ( cpt ) {
-    let i = null,
+    let __this = null,
         elem = document.documentElement,
-        s = {
+        commonInfo = {
             sr: screen.width + "x" + screen.height
         };
 
     function getPv( ) {
         var width = window.innerWidth || elem.clientWidth || document.body.clientWidth,
-            height = window.innerHeight || elem.clientHeight || document.body.clientHeight,
-            uid = utils.cookie( "_nk_" ) || utils.cookie( "_bl_uid" );
-        uid || (uid = utils.uu( ), utils.cookie( "_bl_uid", uid, 15552e3 ));
+            height = window.innerHeight || elem.clientHeight || document.body.clientHeight;
         var obj = {
-            uid: uid,
             dt: document.title,
             dl: location.href,
             dr: document.referrer,
@@ -22,7 +19,7 @@ export default function ( cpt ) {
             ul: elem.lang,
             vp: width + "x" + height
         };
-        s.vp = obj.vp
+        commonInfo.vp = obj.vp
         return obj
     }
     function getPerf( ) {
@@ -130,20 +127,20 @@ export default function ( cpt ) {
                 r.fpt = timing[keys[16]] - timing[keys[1]];
             }
         }
-        s.ct = r.ct
+        commonInfo.ct = r.ct
         return r
     }
 
     utils.on( window, "error", function ( e ) {
-        i && i.errorHandler( e )
+        __this && __this.errorHandler( e )
     }).on( window, "unhandledrejection", function ( e ) {
-        i && i.errorHandler( e )
+        __this && __this.errorHandler( e )
     })
 
     utils.ext(cpt.prototype, {
         activeErrHandler: function ( sw ) {
-            if ( !i || sw ) {
-                i = this
+            if ( !__this || sw ) {
+                __this = this
             }
             return this
         },
@@ -184,7 +181,7 @@ export default function ( cpt ) {
             return _this
         },
         _commonInfo: function ( ) {
-            return s
+            return commonInfo
         },
         _handleUnload: function ( e ) {
             var _this = this,
@@ -198,6 +195,11 @@ export default function ( cpt ) {
                 _this._lg( "speed", _this._spChe )
                 _this._spChe = null
                 clearTimeout( _this._spTmr )
+            }
+            if ( _this._tkChe ) {
+                utils.each( _this._tkChe, function ( key ) {
+                    _this.trackEnd( key )
+                })
             }
             _this._clear( )
         },

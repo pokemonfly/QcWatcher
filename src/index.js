@@ -23,6 +23,5 @@ export default( function ( win ) {
     }
     app._sendPerf( )
     win.__hasInitQc = true
-    win.w = app
     return watcher;
 })( window )

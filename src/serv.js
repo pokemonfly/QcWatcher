@@ -89,9 +89,11 @@ export default function ( cpt ) {
                     t: tag,
                     times: 1 / time,
                     page: _this.getPage( ),
-                    tag: conf.tag || ""
+                    tag: conf.tag || "",
+                    stamp: Date.now( )
                 }, obj, _this._commonInfo( ), {
                     pid: conf.pid,
+                    uid: _this.uid,
                     sid: _this.session,
                     z: ( now++ ).toString( 36 )
                 })

@@ -4,7 +4,7 @@ export default function ( cpt ) {
     var startTime,
         _cacheLog = null,
         warn = window.console ? console.warn : utils.noop,
-        apiList = [
+        apiKeys = [
             "api",
             "success",
             "time",
@@ -46,15 +46,16 @@ export default function ( cpt ) {
                 }, 1 )
             }
         },
-        api: function ( obj, isSuccess, time, code, msg ) {
+        api: function ( obj, isSuccess, time, code, msg, len ) {
             var _this = this;
             obj = "string" == typeof obj ? {
                 api: obj,
                 success: isSuccess,
-                time: time,
-                code: code,
-                msg: msg
-            } : utils.sub( obj, apiList )
+                time,
+                code,
+                msg,
+                len
+            } : utils.sub( obj, apiKeys )
             obj = utils.ext( {
                 code: "",
                 msg: ""
@@ -62,7 +63,7 @@ export default function ( cpt ) {
             obj.success = obj.success ? 1 : 0
             obj.time = +obj.time
             if (!obj.api || isNaN( obj.time )) {
-                warn( "[BL] Invalid time or api" )
+                warn( "Invalid time or api" )
                 return _this
             } else {
                 _this._health[obj.success ? "apisucc" : "apifail"]++;
@@ -128,6 +129,33 @@ export default function ( cpt ) {
                     "x-msg": msg
                 }, time )
             }
+        },
+
+        track: function ( name, obj ) {
+            if ( obj && 'object' == typeof obj.state ) {
+                obj.state = JSON.stringify( obj.state )
+            }
+            return this._lg('track', {
+                name,
+                ...obj
+            });
+        },
+        trackStart: function ( name ) {
+            this._tkChe = this._tkChe || {}
+            this._tkChe[name] = Date.now( )
+            return this
+        },
+        trackEnd: function ( name, obj ) {
+            var st = this.getConfig( "startTime" ) || startTime,
+                tt;
+            if (this._tkChe && this._tkChe[name]) {
+                st = this._tkChe[name]
+                delete this._tkChe[name]
+            }
+            obj = obj || {}
+            obj.time = Date.now( ) - st;
+            obj.tt = st
+            return this.track( name, obj )
         }
     })
     return cpt

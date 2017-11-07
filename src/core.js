@@ -21,11 +21,11 @@ const CFG = {
         rule: /(\w+)\/\d{2,}/g,
         target: "$1"
     },
-    imgUrl: "http://127.0.0.1/www/images/logo.png?",
+    imgUrl: "http://simba.quicloud.cn/image/t.png?",
     sample: 1,
     disabled: false,
     tag: "",
-    disableHook: true,
+    disableHook: false,
     startTime: null,
     enableSPA: true,
     parseHash: function ( e ) {
@@ -53,6 +53,7 @@ class Core {
     constructor( args ) {
         const _hash = NOW.toString( 16 );
         this.session = utils.uu( )
+        this.uid = utils.cookie( "_qc_uid" );
         this.sBegin = Date.now( )
         this._conf = utils.ext( {}, CFG )
         this._samps = {}
@@ -67,6 +68,11 @@ class Core {
         }
         this.hash = function ( ) {
             return _hash
+        }
+
+        if ( !this.uid ) {
+            this.uid = utils.uu( )
+            utils.cookie( "_qc_uid", this.uid, 15552e3 )
         }
         this.setConfig( args, true )
         this._initHandler( )
@@ -138,6 +144,7 @@ class Core {
         _this._conf.page = page
         return _this
     }
+    // 抽样
     sampling( e ) {
         if ( 1 === e ) {
             return true
