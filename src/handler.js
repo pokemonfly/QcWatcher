@@ -185,11 +185,11 @@ export default function ( cpt ) {
         },
         _handleUnload: function ( e ) {
             var _this = this,
-                n = Date.now( );
-            if ( n - _this._lastUnload < 200 ) {
+                now = Date.now( );
+            if ( now - _this._lastUnload < 200 ) {
                 return _this;
             }
-            _this._lastUnload = n
+            _this._lastUnload = now
             _this._sendHealth( e )
             if ( _this._spChe ) {
                 _this._lg( "speed", _this._spChe )
@@ -228,7 +228,7 @@ export default function ( cpt ) {
             var conf = _this._conf;
             utils.on( window, "beforeunload", function ( ) {
                 _this._handleUnload( 0 )
-            }),
+            })
             _this._bindHashChange( conf.enableSPA )
             _this.activeErrHandler( false )
             _this._hasInitHandler = true

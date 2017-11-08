@@ -21,7 +21,7 @@ const CFG = {
         rule: /(\w+)\/\d{2,}/g,
         target: "$1"
     },
-    imgUrl: "http://simba.quicloud.cn/image/t.png?",
+    imgUrl: "//simba.quicloud.cn/image/s.png?",
     sample: 1,
     disabled: false,
     tag: "",
